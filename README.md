@@ -1,6 +1,8 @@
-# 🧪 Automação de Testes com Selenium WebDriver + Java
+# 🧪 Automação de Testes — Seu Barriga (Selenium + Java)
 
-Projeto de estudos em **automação de testes funcionais**, construído durante minha transição de QA Manual para QA Automation. O objetivo não é só passar pelos testes, mas consolidar uma arquitetura de automação reutilizável, de fácil manutenção e alinhada com boas práticas de mercado.
+Projeto de automação de testes funcionais sobre uma **aplicação real** (não um ambiente de treino isolado), como parte da minha evolução em automação de testes com Selenium WebDriver.
+
+> **Sobre a aplicação testada:** este projeto executa testes contra o **Seu Barriga** (seubarriga.wcaquino.me), uma aplicação de treinamento criada pelo professor **Walter Cunha** (wcaquino.me) para alunos do curso de Automação de Testes praticarem cenários reais de ponta a ponta. O código-fonte da aplicação **não pertence a este repositório** — aqui está apenas o meu código de automação, escrito para testá-la a partir de fora, via navegador.
 
 ---
 
@@ -19,15 +21,15 @@ Projeto de estudos em **automação de testes funcionais**, construído durante 
 
 ## 🏗️ Arquitetura
 
-O projeto segue uma arquitetura em camadas, separando responsabilidades entre "o que testar", "onde estão os elementos" e "como interagir com eles":
+Diferente do meu primeiro projeto de estudos (Campo de Treinamento), aqui as ações do Selenium foram incorporadas **diretamente na `BasePage`**, sem uma camada de DSL separada — uma variação arquitetural intencional, para praticar outra forma de organizar as mesmas responsabilidades:
 
 ```
 Teste
   ↓  (extends BaseTest)
 Page Object
-  ↓  (usa DSL via composição)
-DSL
-  ↓  (usa DriverFactory)
+  ↓  (extends BasePage — herda as ações do Selenium)
+DriverFactory
+  ↓
 WebDriver
   ↓
 Navegador (Chrome / Firefox)
@@ -35,15 +37,15 @@ Navegador (Chrome / Firefox)
 
 ### Camadas
 
-**`Teste`** — Define *o que* está sendo validado no cenário (regras de negócio, fluxos, asserts).
+**`Teste`** — Define o cenário e as validações (ex: `ContaTest`).
 
-**`Page Object`** — Representa uma página da aplicação e centraliza as operações específicas dela (ex: `setNome()`, `cadastrar()`). Sabe *onde* está cada elemento.
+**`Page Object`** (`LoginPage`, `MenuPage`, `ContasPage`) — Representa uma tela da aplicação e centraliza as ações específicas dela (ex: `setNome()`, `salvar()`). Sabe *onde* está cada elemento e *o que* fazer com ele.
 
-**`DSL` (Domain Specific Language)** — Centraliza ações reutilizáveis do Selenium (`clicar`, `escrever`, `selecionarCombo`, etc). Sabe *como* executar uma ação, sem saber o significado de negócio dela.
+**`BasePage`** — Classe-mãe de todos os Page Objects. Aqui vivem as ações genéricas do Selenium (`escrever`, `clicarBotao`, `selecionarCombo`, tratamento de alerts, frames, espera explícita, etc). Cada Page Object **herda** esse comportamento (`extends BasePage`).
 
-**`DriverFactory`** — Fábrica centralizada do `WebDriver`, responsável por criar e gerenciar a instância única do navegador (Factory Pattern), incluindo o **chaveamento entre Chrome e Firefox**.
+**`DriverFactory`** — Fábrica centralizada do `WebDriver` (Factory Pattern), com chaveamento entre Chrome e Firefox via `Propriedades`.
 
-> **Composição, não herança:** `BasePage` não herda de `DSL` — ela **tem um** `DSL` como atributo. Isso evita acoplamento desnecessário e reflete corretamente a relação entre as classes (uma Page *usa* a DSL como ferramenta, ela não *é* uma DSL).
+**`BaseTest`** — Ciclo de vida comum a todo teste: faz login automaticamente antes de cada cenário (`@Before`), tira screenshot e fecha o navegador ao final (`@After`), com `try/finally` garantindo que o navegador feche mesmo se o screenshot falhar.
 
 ---
 
@@ -52,99 +54,65 @@ Navegador (Chrome / Firefox)
 ```
 src/main/java/br/ce/wcaquino/
 ├── core/
-│   ├── DriverFactory.java     # Factory Pattern + chaveamento de browser
-│   ├── DSL.java                # Ações reutilizáveis do Selenium
-│   ├── BaseTest.java           # Setup/teardown comum + screenshot automático
-│   ├── BasePage.java           # Base para Page Objects (composição com DSL)
-│   └── Propriedades.java       # Configurações estáticas (browser, fechar ao final)
+│   ├── DriverFactory.java   # Factory Pattern + chaveamento de browser
+│   ├── BasePage.java        # Ações genéricas do Selenium (herdadas pelos Page Objects)
+│   ├── BaseTest.java        # Login automático, screenshot e encerramento do driver
+│   └── Propriedades.java    # Configurações estáticas (browser, fechar ao final)
 │
-├── page/
-│   └── CampoTreinamentoPage.java   # Page Object da aplicação de treino
+├── pages/
+│   ├── LoginPage.java       # Tela de login
+│   ├── MenuPage.java        # Navegação do menu principal
+│   └── ContasPage.java      # Cadastro de contas
 │
-├── test/
-│   ├── TesteCampoTreinamento.java  # Interações básicas (campos, combos, botões...)
-│   ├── TesteAlert.java             # Alerts simples, confirm e prompt
-│   ├── TestesFrames.java           # Frames e múltiplas janelas
-│   ├── DesafioCadastroCompleto.java
-│   ├── DesafioRegrasNegocio.java
-│   └── TestesParametrizados.java   # Data Driven Testing com @RunWith(Parameterized)
-│
-└── suites/
-    └── SuiteTestes.java        # Execução orquestrada de múltiplas classes de teste
-
-src/main/resources/
-├── componentes.html    # Aplicação de treino (Campo de Treinamento) — não incluída no repositório*
-└── frame.html           # Página usada nos testes de iframe — não incluída no repositório*
+└── tests/
+    └── ContaTest.java       # Cenário: inserir uma nova conta
 ```
-
-\* Ver seção [Sobre os arquivos HTML de treino](#-sobre-os-arquivos-html-de-treino) abaixo.
 
 ---
 
 ## ✅ O que já foi implementado
 
-- [x] Interações com elementos básicos (text field, textarea, radio, checkbox, combo, multi-select)
-- [x] Botões, links e obtenção de texto de elementos
-- [x] Alerts: simples, confirm e prompt (`switchTo().alert()`)
-- [x] Frames (visíveis e "escondidos", com scroll via JavaScript)
-- [x] Múltiplas janelas / popups (Window Handles)
-- [x] Execução de JavaScript via `JavascriptExecutor`
-- [x] Estratégias de sincronismo: espera fixa, implícita e **explícita** (`WebDriverWait` + `ExpectedConditions`)
-- [x] Data Driven Testing com `@RunWith(Parameterized.class)`
-- [x] Driver centralizado (Factory Pattern)
-- [x] Chaveamento de browser (Chrome / Firefox) via `enum` + classe de configuração
-- [x] Screenshot automático ao final de cada teste (nome dinâmico via `@Rule TestName`)
-- [x] Suite de testes com execução orquestrada
+- [x] Login automatizado no `@Before` de todo teste (`BaseTest`)
+- [x] Navegação por menu via `clicarLink`
+- [x] Cadastro de conta com validação de mensagem de sucesso
+- [x] Espera explícita (`esperarElemento`) para lidar com conteúdo carregado de forma assíncrona
+- [x] Driver centralizado (Factory Pattern) com chaveamento Chrome/Firefox
+- [x] Screenshot automático ao final de cada teste, com tratamento `try/finally` para garantir o encerramento do navegador mesmo em caso de falha
 
 ## 🔜 Próximos passos
 
-- [ ] Testando uma aplicação real (fora do ambiente de treino)
-- [ ] Execução de testes em paralelo
-- [ ] Execução de testes na nuvem (Selenium Grid)
-- [ ] Relatórios e logs estruturados
+- [ ] Ampliar cobertura: edição e exclusão de contas, movimentações, resumo mensal
+- [ ] Extrair credenciais de login fixas no `BaseTest` para um arquivo de configuração
+- [ ] Suite de testes orquestrada (ainda não criada neste projeto)
+- [ ] Execução em paralelo / múltiplos browsers
 - [ ] Integração com CI/CD
 
 ---
 
-## 🐛 Melhorias conhecidas (transparência é uma prática de QA)
+## 🐛 Melhorias conhecidas
 
-Documentar bugs conscientemente identificados, mesmo sem correção imediata, faz parte de manter um projeto rastreável:
+- **Credenciais fixas no código:** o `BaseTest` faz login com um e-mail/senha fixos, escritos diretamente na classe. Funciona para o estágio atual, mas o ideal é externalizar isso (variável de ambiente ou arquivo de propriedades) antes de qualquer uso mais sério do projeto.
+- **Import não utilizado em `ContaTest`:** `import java.awt.*;` está presente sem uso — resquício de autocomplete, sem efeito no funcionamento, mas vale limpar.
 
-- **`DriverFactory`**: existe uma linha residual (`driver = new ChromeDriver();`) fora do `switch`, que sobrescreve a escolha de browser feita pelo `enum`. Efeito: o chaveamento para Firefox não funciona ainda, mesmo estando configurado corretamente. Correção identificada, pendente de teste (ambiente atual só tem Chrome instalado).
-- **`TestesParametrizados`**: usa `DriverFactory.getDriver().quit()` direto no `@After`, em vez de herdar o comportamento padronizado de `BaseTest`. Deixa a suíte inconsistente — candidato a refatoração.
-- **Dependência duplicada no `pom.xml`**: JUnit está declarado duas vezes com versões diferentes (`4.13.2` e `4.13.1`). Não quebra o build, mas deveria ser consolidado em uma única declaração com `scope test`.
+Nota: o bug de chaveamento de browser identificado no projeto anterior (linha residual sobrescrevendo a escolha do `switch` no `DriverFactory`) **já nasceu corrigido neste projeto**.
 
 ---
 
 ## ▶️ Como rodar
 
-Pré-requisitos: Java 23, Maven, Chrome instalado.
-
-⚠️ **Importante:** este projeto depende dos arquivos HTML, que fazem parte do material do curso e **não estão incluídos neste repositório** (ver seção abaixo). Sem eles, os testes não rodam localmente.
+Pré-requisitos: Java 23, Maven, Chrome instalado, conexão com a internet (os testes acessam `seubarriga.wcaquino.me` diretamente).
 
 ```bash
-# Rodar todos os testes
 mvn test
-
-# Rodar uma suíte específica
-mvn test -Dtest=SuiteTestes
 ```
 
 Os screenshots de cada execução são salvos em `target/screenshot/`, nomeados automaticamente com o nome do método de teste.
 
 ---
 
-## 📄 Sobre os arquivos HTML de treino
-
-Os arquivos usados como aplicação de treino nos testes,fazem parte do material didático — por isso **não são versionados neste repositório** .
-
-O foco deste projeto é demonstrar a **arquitetura de automação** (Page Object, DSL, Factory Pattern, boas práticas de Java) — não o material de treino em si, que permanece de uso restrito ao curso.
-
----
-
 ## 🎓 Sobre este projeto
 
-Este repositório acompanha meus estudos em automação de testes, baseado no curso *Testes Funcionais Automatizados com Selenium WebDriver*. Além de seguir as aulas, venho adaptando e revisando a arquitetura para reforçar conceitos de Java (POO, composição vs. herança), boas práticas de organização de código, e debugging independente de problemas reais — não apenas reprodução do conteúdo assistido.
+Este repositório faz parte da minha trilha de estudos em automação de testes, dando sequência ao projeto anterior de treino (Page Object + DSL sobre uma aplicação isolada). Aqui o foco passa a ser testar uma aplicação real, publicada e acessada via internet, incluindo lidar com sincronismo real de rede, fluxos de autenticação e uma variação arquitetural (herança direta de `BasePage`, sem camada de DSL separada).
 
 ---
 
