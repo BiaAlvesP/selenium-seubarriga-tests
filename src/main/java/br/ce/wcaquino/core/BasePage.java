@@ -1,9 +1,6 @@
 package br.ce.wcaquino.core;
 
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -23,27 +20,34 @@ public class BasePage {
 
 
     public void escrever(By by, String text) {
-
-        DriverFactory.getDriver().findElement(by).clear();// apaga se algo já estiver escrito
-        //sendKeys = faz escrever no campo
-        DriverFactory.getDriver().findElement(by).sendKeys(text);
-
-
+        WebElement elemento = DriverFactory.getDriver().findElement(by);
+        executarJS("arguments[0].value = arguments[1];", elemento, text);
+        executarJS("arguments[0].dispatchEvent(new Event('input', {bubbles:true}));", elemento);
+        executarJS("arguments[0].dispatchEvent(new Event('change', {bubbles:true}));", elemento);
     }
+
 
     public String obterValorCampo(String id) {
         return DriverFactory.getDriver().findElement(By.id(id)).getAttribute("value");
     }
 
+
     public void clicarBotao(By by) {
-
-        DriverFactory.getDriver().findElement(by).click();
-
+        WebElement elemento = DriverFactory.getDriver().findElement(by);
+        try {
+            elemento.click();
+        } catch (Exception e) {
+            executarJS("arguments[0].click();", elemento);
+        }
     }
 
     public void clicar(String id) {
 
         clicarBotao(By.id(id));
+    }
+
+    public void clicarBotaoPorTexto(String texto) {
+        clicarBotao(By.xpath("//button[.='" + texto + "']"));
     }
 
     public Boolean checarClick(String id) {
@@ -116,11 +120,22 @@ public class BasePage {
     }
 
     public void clicarLink(String link) {
-
-        DriverFactory.getDriver().findElement(By.linkText(link)).click();
+        int tentativas = 0;
+        while (tentativas < 5) {
+            try {
+                esperarElemento(By.linkText(link));
+                DriverFactory.getDriver().findElement(By.linkText(link)).click();
+                return;
+            } catch (StaleElementReferenceException | TimeoutException e) {
+                tentativas++;
+            }
+        }
     }
 
-
+    public void esperarPaginaCarregada() {
+        WebDriverWait espera = new WebDriverWait(DriverFactory.getDriver(), Duration.ofSeconds(15));
+        espera.until(driver -> executarJS("return document.readyState").equals("complete"));
+    }
 
     public String obterText(String id) {
         return DriverFactory.getDriver().findElement(By.id(id)).getText();
@@ -185,6 +200,48 @@ public class BasePage {
     public void mudarJanela(String id) {
 
         DriverFactory.getDriver().switchTo().window(id);// nem todos os popup tem indentificados
+    }
+
+
+    // Tabela
+    public WebElement obterCelula(String colunaBusca, String valor, String colunaBotao, String idTabela) {
+        WebElement tabela = DriverFactory.getDriver().findElement(By.xpath("//*[@id='" + idTabela + "']"));
+        int idColuna = obterIndiceColuna(colunaBusca, tabela);
+        int idLinha = obterIndiceLinha(valor, tabela, idColuna);
+        int idColunaBotao = obterIndiceColuna(colunaBotao, tabela);
+        WebElement celula = tabela.findElement(By.xpath(".//tr[" + idLinha + "]/td[" + idColunaBotao + "]"));
+        return celula;
+    }
+
+    public void clicarBotaoTabela(String colunaBusca, String valor, String colunaBotao, String idTabela) {
+        WebElement celula = obterCelula(colunaBusca, valor, colunaBotao, idTabela);
+        celula.findElement(By.xpath(".//input")).click();
+    }
+
+    private int obterIndiceColuna(String colunaBusca, WebElement tabela) {
+        List<WebElement> colunas = tabela.findElements(By.xpath(".//th"));
+        for (int i = 0; i < colunas.size(); i++) {
+            if (colunas.get(i).getText().equals(colunaBusca)) {
+                return i + 1; // XPath começa em 1
+            }
+        }
+        return -1;
+    }
+
+    private int obterIndiceLinha(String valor, WebElement tabela, int idColuna) {
+        List<WebElement> linhas = tabela.findElements(By.xpath(".//tbody//tr"));
+        for (int i = 0; i < linhas.size(); i++) {
+            WebElement celula = linhas.get(i).findElements(By.xpath(".//td")).get(idColuna - 1);
+            if (celula.getText().equals(valor)) {
+                return i + 1; // XPath começa em 1
+            }
+        }
+        return -1;
+    }
+
+    public void esperarCampoPreenchido(By by) {
+        WebDriverWait espera = new WebDriverWait(DriverFactory.getDriver(), Duration.ofSeconds(10));
+        espera.until(driver -> !driver.findElement(by).getAttribute("value").isEmpty());
     }
 
 
