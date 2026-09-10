@@ -6,6 +6,10 @@ import br.ce.wcaquino.pages.MovimentacaoPage;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+
 public class MovimentacaoTest extends BaseTest {
 
     private MenuPage menuPage = new MenuPage();
@@ -26,4 +30,21 @@ public class MovimentacaoTest extends BaseTest {
         Assert.assertEquals("Movimentação adicionada com sucesso!", movPage.obterMensagemSucesso());
     }
 
-}
+    @Test
+    public void testCamposObrigatorios() {
+        menuPage.acessarTelaCriarMovimentacao();
+        movPage.salvar();
+
+
+        List<String> erros = movPage.obterMensagensErro();
+        Assert.assertTrue(erros.containsAll(Arrays.asList(
+                "Data da Movimentação é obrigatório",
+                "Data do pagamento é obrigatório",
+                "Descrição é obrigatório",
+                "Interessado é obrigatório",
+                "Valor é obrigatório",
+                "Valor deve ser um número"
+        )));
+       Assert.assertEquals(6, erros.size());
+    }
+    }
