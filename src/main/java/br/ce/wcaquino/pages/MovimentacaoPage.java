@@ -58,6 +58,7 @@ public class MovimentacaoPage extends BasePage {
 
     public List<String> obterMensagensErro() {
 
+        esperarElemento(By.xpath("//div[@class='alert alert-danger']//li"));
         List<WebElement> erros = DriverFactory.getDriver().findElements(By.xpath("//div[@class='alert alert-danger']//li"));
         List<String> retorno = new java.util.ArrayList<>();
         for (WebElement erro : erros) {
