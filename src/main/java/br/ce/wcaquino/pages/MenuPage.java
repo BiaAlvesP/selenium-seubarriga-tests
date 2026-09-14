@@ -20,4 +20,10 @@ public class MenuPage extends BasePage {
         esperarPaginaCarregada();
         clicarLink("Criar Movimentação");
     }
+
+    public void acessarTelaResumoMensal(){
+        esperarPaginaCarregada();
+        clicarLink("Resumo Mensal");
+    }
+
 }

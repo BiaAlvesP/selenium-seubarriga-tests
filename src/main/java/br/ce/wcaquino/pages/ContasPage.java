@@ -32,4 +32,9 @@ public class ContasPage extends BasePage {
         System.out.println("URL atual: " + DriverFactory.getDriver().getCurrentUrl());
         System.out.println("Quantidade de janelas abertas: " + DriverFactory.getDriver().getWindowHandles().size());
     }
+
+    public void excluirConta(String nomeConta) {
+        obterCelula("Conta", nomeConta, "Ações", "tabelaContas")
+                .findElement(By.xpath(".//span[@class='glyphicon glyphicon-remove-circle']")).click();
+    }
 }

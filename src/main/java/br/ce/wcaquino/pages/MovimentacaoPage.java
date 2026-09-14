@@ -1,7 +1,11 @@
 package br.ce.wcaquino.pages;
 
 import br.ce.wcaquino.core.BasePage;
+import br.ce.wcaquino.core.DriverFactory;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+
+import java.util.List;
 
 public class MovimentacaoPage extends BasePage {
     public void setDataPagamento(String data) {
@@ -51,4 +55,17 @@ public class MovimentacaoPage extends BasePage {
         esperarElemento(By.xpath("//div[@class='alert alert-success']"));
         return obterTexto(By.xpath("//div[@class='alert alert-success']"));
     }
+
+    public List<String> obterMensagensErro() {
+
+        esperarElemento(By.xpath("//div[@class='alert alert-danger']//li"));
+        List<WebElement> erros = DriverFactory.getDriver().findElements(By.xpath("//div[@class='alert alert-danger']//li"));
+        List<String> retorno = new java.util.ArrayList<>();
+        for (WebElement erro : erros) {
+            retorno.add(erro.getText());
+        }
+        return retorno;
+
+    }
+
 }
