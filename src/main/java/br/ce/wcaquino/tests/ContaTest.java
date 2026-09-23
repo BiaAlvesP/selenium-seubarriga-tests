@@ -2,6 +2,7 @@ package br.ce.wcaquino.tests;
 
 import br.ce.wcaquino.core.BasePage;
 import br.ce.wcaquino.core.BaseTest;
+import br.ce.wcaquino.core.DriverFactory;
 import br.ce.wcaquino.pages.ContasPage;
 import br.ce.wcaquino.pages.MenuPage;
 import org.junit.Assert;
@@ -33,10 +34,18 @@ public class ContaTest extends BaseTest {
         contasPage.esperarElemento(By.xpath("//div[@class='alert alert-success']"));
 
         menuPage.acessarTelaListarConta();
+        System.out.println("URL depois de listar contas: " + DriverFactory.getDriver().getCurrentUrl());
+
         contasPage.clicarAlterarConta(nomeOriginal);
+        System.out.println("URL depois de clicar em editar: " + DriverFactory.getDriver().getCurrentUrl());
+
         contasPage.esperarElemento(By.id("nome"));
-        contasPage.setNome("Conta editada " + System.currentTimeMillis());
+        String nomeEditado = "Conta editada " + System.currentTimeMillis();
+        contasPage.setNome(nomeEditado);
+        System.out.println("Valor do campo antes de salvar: " + contasPage.obterValorCampo("nome"));
+
         contasPage.salvar();
+        System.out.println("URL depois de clicar em salvar: " + DriverFactory.getDriver().getCurrentUrl());
 
         Assert.assertEquals("Conta alterada com sucesso!", contasPage.obterMensagemSucesso());
     }

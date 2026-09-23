@@ -258,6 +258,15 @@ public class BasePage {
         return js.executeScript(cmd,param);
     }
 
+    public void esperarJQueryPronto() {
+        WebDriverWait espera = new WebDriverWait(DriverFactory.getDriver(), Duration.ofSeconds(10));
+        espera.until(driver -> {
+            Object resultado = executarJS(
+                    "return (typeof jQuery !== 'undefined') ? jQuery.active === 0 : true;"
+            );
+            return Boolean.TRUE.equals(resultado);
+        });
+    }
 
 
 }
