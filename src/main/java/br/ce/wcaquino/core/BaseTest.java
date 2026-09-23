@@ -23,8 +23,8 @@ public class BaseTest {
     @Before
     public void inicializa() {
         page.acessarTelaInicial();
-        page.setEmail("bia1@gmail.com");
-        page.setSenha("123456");
+        page.setEmail("bia2@gmail.com");
+        page.setSenha("Chobia2501@");
         page.entrar();
     }
 
