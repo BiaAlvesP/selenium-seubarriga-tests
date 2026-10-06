@@ -5,20 +5,23 @@ import br.ce.wcaquino.pages.MenuPage;
 import br.ce.wcaquino.pages.MovimentacaoPage;
 import br.ce.wcaquino.tests.utils.DataUtils;
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 
 import java.lang.reflect.Array;
 import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MovimentacaoTest extends BaseTest {
 
     private MenuPage menuPage = new MenuPage();
     private MovimentacaoPage movPage = new MovimentacaoPage();
 
     @Test
-    public void testInserirMovimentacao() {
+    public void test1_InserirMovimentacao() {
         menuPage.acessarTelaCriarMovimentacao();
 
         String dataAtual = DataUtils.obterDataComDiferencaDias(0);
@@ -36,7 +39,7 @@ public class MovimentacaoTest extends BaseTest {
     }
 
     @Test
-    public void testCamposObrigatorios() {
+    public void test2_CamposObrigatorios() {
         menuPage.acessarTelaCriarMovimentacao();
         movPage.salvar();
 
@@ -54,7 +57,7 @@ public class MovimentacaoTest extends BaseTest {
     }
 
     @Test
-    public void testInserirMovimentacaoFutura() {
+    public void test3_InserirMovimentacaoFutura() {
         menuPage.acessarTelaCriarMovimentacao();
 
         String dataFutura = DataUtils.obterDataComDiferencaDias(5);
