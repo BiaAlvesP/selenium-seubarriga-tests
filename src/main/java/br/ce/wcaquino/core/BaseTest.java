@@ -2,10 +2,7 @@ package br.ce.wcaquino.core;
 
 import br.ce.wcaquino.pages.LoginPage;
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.rules.TestName;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -19,7 +16,15 @@ public class BaseTest {
     @Rule
     public TestName testName = new TestName();
 
+    private static LoginPage page = new LoginPage();
 
+    @Before
+    public  void inicializa() {
+        page.acessarTelaInicial();
+        page.setEmail("bia2@gmail.com");
+        page.setSenha("Chobia2501@");
+        page.entrar();
+    }
 
     @After
     public void finaliza() throws IOException {

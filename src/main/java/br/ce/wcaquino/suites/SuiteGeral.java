@@ -20,18 +20,4 @@ import org.junit.runners.Suite;
 })
 public class SuiteGeral {
 
-    private static LoginPage page = new LoginPage();
-
-    @BeforeClass
-    public static void inicializa() {
-        page.acessarTelaInicial();
-        page.setEmail("bia2@gmail.com");
-        page.setSenha("Chobia2501@");
-        page.entrar();
-    }
-
-    @AfterClass
-    public static void finaliza() {
-        DriverFactory.killDriver();
-    }
 }
