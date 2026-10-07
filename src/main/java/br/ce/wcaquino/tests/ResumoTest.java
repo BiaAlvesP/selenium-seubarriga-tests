@@ -8,6 +8,9 @@ import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.NoSuchElementException;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ResumoTest extends BaseTest {
@@ -28,7 +31,12 @@ public class ResumoTest extends BaseTest {
     public void test2_ResumoMensal() {
         menuPage.acessarTelaResumoMensal();
         Assert.assertEquals("Seu Barriga - Extrato", DriverFactory.getDriver().getTitle());
-    }
+    try {
+        DriverFactory.getDriver().findElement(By.xpath("//*[@id='tabelaExtrato']/div[2]/table/tbody/tr/td"));
+        Assert.fail();
+    }catch (NoSuchElementException e) {
 
+    }
+    }
 
 }
