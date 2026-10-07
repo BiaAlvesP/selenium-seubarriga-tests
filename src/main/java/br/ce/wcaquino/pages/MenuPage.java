@@ -36,4 +36,9 @@ public class MenuPage extends BasePage {
         clicarLink("Resumo Mensal");
     }
 
+    public void acessarTelaHome(){
+        esperarPaginaCarregada();
+        clicarLink("Home");
+    }
+
 }

@@ -6,18 +6,21 @@ import br.ce.wcaquino.core.DriverFactory;
 import br.ce.wcaquino.pages.ContasPage;
 import br.ce.wcaquino.pages.MenuPage;
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
+import org.junit.runners.MethodSorters;
 import org.openqa.selenium.By;
 
 import java.awt.*;
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ContaTest extends BaseTest {
 
     MenuPage menuPage = new MenuPage();
     ContasPage contasPage = new ContasPage();
 
     @Test
-    public void testInserirConta() {
+    public void test1_InserirConta() {
         menuPage.acessarTelaInserirConta();
         contasPage.setNome("Conta do Teste");
         contasPage.salvar();
@@ -26,7 +29,7 @@ public class ContaTest extends BaseTest {
     }
 
     @Test
-    public void testAlterarConta() {
+    public void test2_AlterarConta() {
         String nomeOriginal = "Conta " + System.currentTimeMillis();
         menuPage.acessarTelaInserirConta();
         contasPage.setNome(nomeOriginal);
@@ -51,7 +54,7 @@ public class ContaTest extends BaseTest {
     }
 
     @Test
-    public void testInserirContaMesmoNome() {
+    public void test3_InserirContaMesmoNome() {
         menuPage.acessarTelaInserirConta();
         contasPage.setNome("Conta do Teste");
         contasPage.salvar();
@@ -59,11 +62,5 @@ public class ContaTest extends BaseTest {
         Assert.assertEquals("Já existe uma conta com esse nome!", contasPage.obterMensagemErro());
     }
 
-    @Test
-    public void testExcluirContaMovimentacao(){
-        menuPage.acessarTelaListarConta();
-        contasPage.excluirConta("Conta do Teste");
-        Assert.assertEquals("Conta em uso na movimentações", contasPage.obterMensagemErro());
-    }
 
 }

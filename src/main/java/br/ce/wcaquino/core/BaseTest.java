@@ -15,18 +15,11 @@ import java.io.IOException;
 
 public class BaseTest {
 
-    private LoginPage page = new LoginPage();
 
     @Rule
     public TestName testName = new TestName();
 
-    @Before
-    public void inicializa() {
-        page.acessarTelaInicial();
-        page.setEmail("bia2@gmail.com");
-        page.setSenha("Chobia2501@");
-        page.entrar();
-    }
+
 
     @After
     public void finaliza() throws IOException {
