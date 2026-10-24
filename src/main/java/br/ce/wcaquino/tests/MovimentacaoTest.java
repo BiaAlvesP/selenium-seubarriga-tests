@@ -14,7 +14,6 @@ import java.sql.Date;
 import java.util.Arrays;
 import java.util.List;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class MovimentacaoTest extends BaseTest {
 
     private MenuPage menuPage = new MenuPage();
@@ -31,7 +30,7 @@ public class MovimentacaoTest extends BaseTest {
         movPage.setDescricao("Descrição da movimentação");
         movPage.setInteressado("Interessado da movimentação");
         movPage.setValor("100.00");
-        movPage.setConta("Conta do Teste");
+        movPage.setConta("Conta para movimentacoes");
         movPage.setStatusPago();
         movPage.salvar();
 
@@ -67,7 +66,7 @@ public class MovimentacaoTest extends BaseTest {
         movPage.setDescricao("Descrição da movimentação");
         movPage.setInteressado("Interessado da movimentação");
         movPage.setValor("100.00");
-        movPage.setConta("Conta do Teste");
+        movPage.setConta("Conta para movimentacoes");
         movPage.setStatusPago();
         movPage.salvar();
 

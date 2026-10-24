@@ -13,7 +13,6 @@ import org.openqa.selenium.By;
 
 import java.awt.*;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ContaTest extends BaseTest {
 
     MenuPage menuPage = new MenuPage();
@@ -30,25 +29,15 @@ public class ContaTest extends BaseTest {
 
     @Test
     public void test2_AlterarConta() {
-        String nomeOriginal = "Conta " + System.currentTimeMillis();
-        menuPage.acessarTelaInserirConta();
-        contasPage.setNome(nomeOriginal);
-        contasPage.salvar();
-        contasPage.esperarElemento(By.xpath("//div[@class='alert alert-success']"));
 
         menuPage.acessarTelaListarConta();
-        System.out.println("URL depois de listar contas: " + DriverFactory.getDriver().getCurrentUrl());
 
-        contasPage.clicarAlterarConta(nomeOriginal);
-        System.out.println("URL depois de clicar em editar: " + DriverFactory.getDriver().getCurrentUrl());
+        contasPage.clicarAlterarConta("Conta para alterar");
 
         contasPage.esperarElemento(By.id("nome"));
-        String nomeEditado = "Conta editada " + System.currentTimeMillis();
-        contasPage.setNome(nomeEditado);
-        System.out.println("Valor do campo antes de salvar: " + contasPage.obterValorCampo("nome"));
+        contasPage.setNome("Conta alterada");
 
         contasPage.salvar();
-        System.out.println("URL depois de clicar em salvar: " + DriverFactory.getDriver().getCurrentUrl());
 
         Assert.assertEquals("Conta alterada com sucesso!", contasPage.obterMensagemSucesso());
     }

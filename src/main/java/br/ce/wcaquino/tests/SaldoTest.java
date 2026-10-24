@@ -14,6 +14,6 @@ public class SaldoTest extends BaseTest {
     @Test
     public void testSaldoConta() {
         menuPage.acessarTelaHome();
-        Assert.assertEquals("100.00",page.obterSaldoConta("Conta do Teste"));
+        Assert.assertEquals("534.00",page.obterSaldoConta("Conta para saldo"));
     }
 }
