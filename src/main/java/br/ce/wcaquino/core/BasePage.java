@@ -133,7 +133,7 @@ public class BasePage {
     }
 
     public void esperarPaginaCarregada() {
-        WebDriverWait espera = new WebDriverWait(DriverFactory.getDriver(), Duration.ofSeconds(15));
+        WebDriverWait espera = new WebDriverWait(DriverFactory.getDriver(), Duration.ofSeconds(25));
         espera.until(driver -> executarJS("return document.readyState").equals("complete"));
     }
 

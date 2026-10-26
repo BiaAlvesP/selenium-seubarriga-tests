@@ -12,7 +12,6 @@ import org.openqa.selenium.By;
 
 import org.openqa.selenium.NoSuchElementException;
 
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class ResumoTest extends BaseTest {
 
     private MenuPage menuPage = new MenuPage();
@@ -31,6 +30,8 @@ public class ResumoTest extends BaseTest {
     public void test2_ResumoMensal() {
         menuPage.acessarTelaResumoMensal();
         Assert.assertEquals("Seu Barriga - Extrato", DriverFactory.getDriver().getTitle());
+        resumoPage.selecionarAno("2024");
+        resumoPage.buscar();
     try {
         DriverFactory.getDriver().findElement(By.xpath("//*[@id='tabelaExtrato']/div[2]/table/tbody/tr/td"));
         Assert.fail();
