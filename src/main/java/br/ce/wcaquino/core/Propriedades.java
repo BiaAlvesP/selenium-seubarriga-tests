@@ -14,7 +14,9 @@ public class Propriedades {
 
     public enum TipoExecucao {
         LOCAL,
-        GRID
+        GRID,
+        NUVEM
     }
+
 
 }
